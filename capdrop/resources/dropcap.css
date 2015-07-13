@@ -1,0 +1,20 @@
+@font-face {
+	font-family: dropcap;
+	src: url('fonts/dropcap-font.ttf');
+}
+
+span .dropcap {
+	font-family: dropcap;
+	font-size: 4rem;
+	display: inline-block;
+	text-transform: uppercase;
+	font-weight: 200;
+	float: left;
+	margin-right: 0.3125rem;
+	padding-top: 0.0625rem;
+	vertical-align: text-top;
+}
+
+p.calibre9 {
+	clear: both;
+}
