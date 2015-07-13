@@ -1,6 +1,7 @@
 import zipfile
 from lxml import html, etree
 import re
+from os.path import dirname, relpath
 
 
 class CapDrop:
@@ -9,6 +10,7 @@ class CapDrop:
 		self.outbook = zipfile.ZipFile('(NEW)_' + filename, 'w')
 
 		self.filelist = self.inbook.namelist()
+		self.dir = dirname([i for i in self.filelist if 'htm' in i][0])
 		self.fontfile = fontfile
 
 		self.add_styledata()
@@ -46,30 +48,30 @@ class CapDrop:
 
 	def add_styledata(self):
 		with open('resources/dropcap.css', 'r') as incss:
-			self.outbook.writestr('dropcap.css', incss.read())
+			self.outbook.writestr('dropcap-adder/dropcap.css', incss.read())
 		
-		self.outbook.write(self.fontfile, 'fonts/dropcap-font.ttf')
+		self.outbook.write(self.fontfile, 'dropcap-adder/fonts/dropcap-font.ttf')
 
 		content_file = [i for i in self.filelist if 'content.opf' in i][0]
-		content = etree.fromstring(self.inbook.read('content.opf'))
-		manif = content.xpath("//*[local-name()= 'manifest']")[0]
+		content = html.fromstring(self.inbook.read(content_file))
+		manif = content.xpath("//manifest")[0]
 
 		itemfont = etree.SubElement(manif, "item")
 		attr = itemfont.attrib
 		itemfont.attrib.update({
 			"id" : "dropcap-font",
-			"href" : "fonts/dropcap-font.ttf",
+			"href" : relpath("dropcap-adder/fonts/dropcap-font.ttf", content_file)[3:],
 			"media-type" : "application/x-font-truetype"
 		})
-
+		print "Font", relpath("dropcap-adder/fonts/dropcap-font.ttf", content_file)[3:]
 		itemcss = etree.SubElement(manif, "item")
 		itemcss.attrib.update({
 			"id" : "dropcap-css",
-			"href" : "dropcap.css",
+			"href" : relpath("dropcap-adder/dropcap.css", content_file)[3:],
 			"media-type" : "text/css"
 		})
 
-		self.outbook.writestr('content.opf', etree.tostring(content))
+		self.outbook.writestr(content_file, html.tostring(content))
 
 	def edit_htmls(self):
 		htmfiles = [i for i in self.filelist if 'htm' in i]
@@ -82,11 +84,11 @@ class CapDrop:
 			link = etree.SubElement(head, "link")
 			link.attrib.update({
 				"rel" : "stylesheet",
-				"href" : "dropcap.css",
+				"href" : relpath("dropcap-adder/dropcap.css", htmfile)[3:],
 				"type" : "text/css"
 			})
 
-			self.outbook.writestr(htmfile, etree.tostring(tree))
+			self.outbook.writestr(htmfile, html.tostring(tree))
 
 	def complete(self):
 		remfiles = [i for i in self.filelist if i not in self.outbook.namelist()]
