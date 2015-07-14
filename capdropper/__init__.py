@@ -1,0 +1,1 @@
+from .capdrop import console_main

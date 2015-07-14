@@ -1,17 +1,20 @@
 import zipfile
 from lxml import html, etree
 import re
+import argparse
 from os.path import *
 
 
 class CapDrop:
-	def __init__(self, filename, fontfile):
-		self.inbook = zipfile.ZipFile(filename, 'r')
-		newbase = "(NEW)_" + basename(filename)
-		self.outbook = zipfile.ZipFile(join(dirname(filename), newbase), 'w')
+	def __init__(self):
+		self.get_args()
+
+		self.inbook = zipfile.ZipFile(self.filename, 'r')
+		newbase = "(NEW)_" + basename(self.filename)
+		self.outbook = zipfile.ZipFile(join(dirname(self.filename), newbase), 'w')
 
 		self.filelist = self.inbook.namelist()
-		self.fontfile = fontfile
+		self.fontfile = "resources/dropcap.ttf"
 
 		self.add_styledata()
 		self.edit_htmls()
@@ -28,7 +31,7 @@ class CapDrop:
 				break
 			else:
 				for child in para.xpath("descendant::*"):
-					if child.text and re.search(r"\w", child.text) and len(child.text) > 50:
+					if child.text and re.search(r"\w", child.text) and len(child.text) > 40:
 						intro = child
 						chosen = True
 						break
@@ -100,7 +103,12 @@ class CapDrop:
 
 		print "File writing completed"
 
+	def get_args(self):
+		parser = argparse.ArgumentParser()
+		parser.add_argument("file", help="File to be beautified")
 
-drop = CapDrop("samples/Do Androids Dream of Electric Sheep - Philip K. Dick.epub", 'resources/dropcap.ttf')
-drop2 = CapDrop("samples/Lolita - Vladimir Nabokov.epub", 'resources/dropcap.ttf')
-drop3 = CapDrop("samples/Philip Reeve - [Mortal Engines 05 - Fever Crumb 01] - Fever Crumb (epub).epub", 'resources/dropcap.ttf')
+		args = parser.parse_args()
+		self.filename = args.file
+
+def console_main():
+	obj = CapDrop()
