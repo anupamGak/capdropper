@@ -1,20 +1,22 @@
 @font-face {
 	font-family: dropcap;
-	src: url('fonts/dropcap-font.ttf');
+	src: url("fonts/dropcap-font.ttf");
 }
 
-span .dropcap {
+body {
+	line-height: 1.2em;
+}
+
+span.dropcap {
 	font-family: dropcap;
-	font-size: 4rem;
+	font-size: 5rem;
 	display: inline-block;
 	text-transform: uppercase;
 	font-weight: 200;
 	float: left;
 	margin-right: 0.3125rem;
-	padding-top: 0.0625rem;
+	padding-top: -0.3rem;
 	vertical-align: text-top;
-}
-
-p.calibre9 {
-	clear: both;
+	line-height: 4.8rem;
+	height: 4.8rem;
 }
